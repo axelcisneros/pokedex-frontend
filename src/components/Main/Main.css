@@ -1,0 +1,29 @@
+.main {
+  position: relative;
+  min-height: calc(100vh - 140px);
+  background-color: var(--color-background);
+}
+
+.main__content {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.main__preloader {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background-color: var(--color-background);
+}
+
+@media (max-width: 768px) {
+  .main {
+    min-height: calc(100vh - 120px);
+  }
+
+  .main__content {
+    padding: 20px 10px;
+  }
+}

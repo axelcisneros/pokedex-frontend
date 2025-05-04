@@ -10,14 +10,25 @@ export default [
     files: ['**/*.{js,jsx}'],
     languageOptions: {
       ecmaVersion: 2020,
-      globals: globals.browser,
+      globals: {
+        ...globals.browser,
+        React: 'readonly',
+        JSX: 'readonly'
+      },
       parserOptions: {
         ecmaVersion: 'latest',
         ecmaFeatures: { jsx: true },
         sourceType: 'module',
       },
     },
-    settings: { react: { version: '18.3' } },
+    settings: { 
+      react: { version: '18.3' },
+      'import/resolver': {
+        node: {
+          extensions: ['.js', '.jsx']
+        }
+      }
+    },
     plugins: {
       react,
       'react-hooks': reactHooks,
@@ -29,11 +40,15 @@ export default [
       ...react.configs['jsx-runtime'].rules,
       ...reactHooks.configs.recommended.rules,
       'react/jsx-no-target-blank': 'off',
-      'react-refresh/only-export-components': [
-        'warn',
-        { allowConstantExport: true },
-      ],
-      "react/prop-types": "off",
+      'react-refresh/only-export-components': 'off',
+      "react/prop-types": 'off',
+      'no-unused-vars': ['error', { 
+        varsIgnorePattern: '^_',
+        argsIgnorePattern: '^_'
+      }],
+      'no-console': ['warn', { allow: ['error'] }],
+      'react/jsx-uses-react': 'off',
+      'react/react-in-jsx-scope': 'off'
     },
   },
 ]
