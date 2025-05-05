@@ -1,12 +1,54 @@
-# React + Vite
+# Proyecto Final Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este proyecto es una aplicación web desarrollada como parte del proyecto final del curso. Es una Pokedex interactiva que permite a los usuarios buscar y explorar información sobre diferentes Pokémon.
 
-Currently, two official plugins are available:
+## Capturas del Proyecto
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+A continuación, se presentan algunas capturas de pantalla del proyecto:
 
-## Expanding the ESLint configuration
+![Captura 1](./src/images/capturaproject1.png)
+![Captura 2](./src/images/capturaproject2.png)
+![Captura 3](./src/images/capturaproject3.png)
+![Captura 4](./src/images/capturaproject4.png)
+![Captura 5](./src/images/capturaproject5.png)
+![Captura 6](./src/images/capturaproject6.png)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Tecnologías Utilizadas
+
+- **React**: Biblioteca de JavaScript para construir interfaces de usuario.
+- **Vite**: Herramienta de construcción rápida para proyectos web modernos.
+- **CSS**: Utilizado para el diseño y estilo de la aplicación.
+- **JavaScript (ES6+)**: Lenguaje de programación principal.
+- **PokeAPI**: API utilizada para obtener datos de los Pokémon.
+
+## Propiedades de CSS
+
+El proyecto utiliza las siguientes propiedades de CSS para el diseño y estilo:
+
+- Flexbox y Grid para la disposición de los elementos.
+- Variables CSS para mantener consistencia en colores y fuentes.
+- Media queries para diseño responsivo.
+- Animaciones y transiciones para mejorar la experiencia del usuario.
+
+## Estructura del Proyecto
+
+El proyecto está organizado en componentes reutilizables dentro de la carpeta `src/components`. Cada componente tiene su propio archivo `.jsx` y `.css`.
+
+## Dependencias
+
+- **react**: ^18.0.0
+- **react-dom**: ^18.0.0
+- **vite**: ^4.0.0
+
+## Dependencias de Desarrollo
+
+- **@vitejs/plugin-react**: ^4.0.0
+- **eslint**: ^8.0.0
+- **eslint-config-react-app**: ^7.0.0
+
+## Cómo Ejecutar el Proyecto
+
+1. Clona este repositorio.
+2. Instala las dependencias con `npm install`.
+3. Inicia el servidor de desarrollo con `npm run dev`.
+4. Abre [http://localhost:3000](http://localhost:3000) en tu navegador.
