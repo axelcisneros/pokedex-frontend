@@ -6,12 +6,12 @@ Este proyecto es una aplicación web desarrollada como parte del proyecto final 
 
 A continuación, se presentan algunas capturas de pantalla del proyecto:
 
-![Captura 1](./src/images/capturaproject1.png)
-![Captura 2](./src/images/capturaproject2.png)
-![Captura 3](./src/images/capturaproject3.png)
-![Captura 4](./src/images/capturaproject4.png)
-![Captura 5](./src/images/capturaproject5.png)
-![Captura 6](./src/images/capturaproject6.png)
+![Captura 1](./src/assets/images/capturaproject1.png)
+![Captura 2](./src/assets/images/capturaproject2.png)
+![Captura 3](./src/assets/images/capturaproject3.png)
+![Captura 4](./src/assets/images/capturaproject4.png)
+![Captura 5](./src/assets/images/capturaproject5.png)
+![Captura 6](./src/assets/images/capturaproject6.png)
 
 ## Tecnologías Utilizadas
 

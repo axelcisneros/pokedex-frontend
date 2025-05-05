@@ -1,5 +1,5 @@
 import './NotFound.css';
-import notFoundImage from '../../images/404.png';
+import notFoundImage from '../../assets/images/404.png';
 import Button from '../Button/Button';
 
 function NotFound() {
