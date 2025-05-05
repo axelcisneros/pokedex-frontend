@@ -7,14 +7,12 @@ import { getFilterData } from '../../utils/pokeapi';
 
 function Header({ onSearch, onFilter }) {
   const [types, setTypes] = useState([]);
-  const [generations, setGenerations] = useState([]);
 
   useEffect(() => {
     const fetchFilterData = async () => {
       try {
-        const { types, generations } = await getFilterData();
+        const { types } = await getFilterData();
         setTypes(types);
-        setGenerations(generations);
       } catch (error) {
         console.error('Error fetching filter data:', error);
       }
@@ -51,11 +49,6 @@ function Header({ onSearch, onFilter }) {
             options={types.map((type) => ({ value: type.name, label: type.name }))}
             onChange={(e) => handleFilterChange(e, 'types')}
             placeholder="Filtrar por tipo"
-          />
-          <Select
-            options={generations.map((generation) => ({ value: generation.name, label: generation.name }))}
-            onChange={(e) => handleFilterChange(e, 'generations')}
-            placeholder="Filtrar por generación"
           />
         </div>
         <Navigation />

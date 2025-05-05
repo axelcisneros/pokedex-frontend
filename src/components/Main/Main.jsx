@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Route, Routes } from 'react-router-dom';
-import { getPokemonList, getPokemonImage, fetchTypePokemons, fetchGenerationPokemons } from '../../utils/pokeapi';
+import { getPokemonList, getPokemonImage, fetchTypePokemons } from '../../utils/pokeapi';
 import './Main.css';
 import PokemonList from '../PokemonList/PokemonList';
 import Preloader from '../Preloader/Preloader';
@@ -96,6 +96,7 @@ function Main({ favorites, onToggleFavorite, searchQuery, filter }) {
     applyFilter();
   }, [searchQuery, showFavorites, favorites, pokemons, apiError]);
 
+  // Eliminar lógica de filtro de generación
   useEffect(() => {
     const applyFilter = async () => {
       setIsSearching(true);
@@ -103,16 +104,11 @@ function Main({ favorites, onToggleFavorite, searchQuery, filter }) {
       let filtered = pokemons;
 
       if (filter) {
-        const { types = [], generations = [] } = filter;
+        const { types = [] } = filter;
 
         if (types.length > 0) {
           const typePokemons = await fetchTypePokemons(types);
           filtered = filtered.filter((pokemon) => typePokemons.includes(pokemon.name));
-        }
-
-        if (generations.length > 0) {
-          const generationPokemons = await fetchGenerationPokemons(generations);
-          filtered = filtered.filter((pokemon) => generationPokemons.includes(pokemon.name));
         }
       }
 
