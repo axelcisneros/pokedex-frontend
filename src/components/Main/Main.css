@@ -1,13 +1,16 @@
+/* Estilos específicos del componente Main */
 .main {
   position: relative;
-  min-height: calc(100vh - 140px);
+  height: 500px;
   background-color: var(--color-background);
 }
 
 .main__content {
   max-width: 1280px;
+  height: 400px;
   margin: 0 auto;
   padding: 40px 20px;
+  overflow: auto;
 }
 
 .main__preloader {

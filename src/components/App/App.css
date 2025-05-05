@@ -4,8 +4,9 @@
   padding: 2rem;
 }
 
+/* Estilos específicos del componente App */
 .app {
-  min-height: 100vh;
+  max-height: 100vh;
   display: flex;
   flex-direction: column;
   background-color: var(--color-background);
@@ -17,7 +18,7 @@
   display: grid;
   place-items: center;
   background-color: var(--color-background);
-  z-index: 9999;
+  z-index: 3; /* Ajustado dentro del rango permitido */
 }
 
 .app__header {
@@ -37,7 +38,6 @@
 
 .app__content {
   flex: 1;
-  padding: 20px;
   max-width: 1280px;
   margin: 0 auto;
   width: 100%;

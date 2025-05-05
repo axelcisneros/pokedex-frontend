@@ -3,7 +3,7 @@
   padding: 20px 0;
   margin-top: auto;
   position: relative;
-  z-index: 10;
+  z-index: 0; /* Asegurar que el footer no interfiera con el popup */
 }
 
 .footer__container {

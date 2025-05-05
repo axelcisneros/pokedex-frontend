@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './PopupWithForm.css';
-import { getPokemonDetails } from '../../utils/PokeApi';
+import { getPokemonDetails } from '../../utils/pokeapi';
 import Preloader from '../Preloader/Preloader';
 
-function PopupWithForm({ isOpen, onClose, pokemonUrl }) {
+function PopupWithForm({ isOpen, onClose, pokemonUrl, onNavigate }) {
   const [pokemonData, setPokemonData] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (isOpen && pokemonUrl) {
@@ -18,17 +18,15 @@ function PopupWithForm({ isOpen, onClose, pokemonUrl }) {
 
   const loadPokemonDetails = async (pokemonId) => {
     try {
-      setLoading(true);
+      setIsLoading(true);
       const data = await getPokemonDetails(pokemonId);
       setPokemonData(data);
       setError(null);
-      // Mantener el preloader visible por 5 segundos
-      await new Promise(resolve => setTimeout(resolve, 5000));
     } catch (error) {
       console.error('Error al cargar detalles del Pokémon:', error);
       setError('Error al cargar los detalles del Pokémon');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -49,136 +47,112 @@ function PopupWithForm({ isOpen, onClose, pokemonUrl }) {
     return () => document.removeEventListener('keydown', handleEscClose);
   }, [onClose]);
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add('popup-open');
+    } else {
+      document.body.classList.remove('popup-open');
+    }
+    return () => document.body.classList.remove('popup-open');
+  }, [isOpen]);
+
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
           className="popup-overlay"
           onClick={handleOverlayClick}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
         >
-          <motion.div
-            className="popup-content"
-            initial={{ scale: 0, rotate: 720 }}
-            animate={{ scale: 1, rotate: 0 }}
-            exit={{ scale: 0, rotate: -720 }}
-            transition={{ type: "spring", duration: 0.5 }}
-          >
-            <button className="popup-close" onClick={onClose}>&times;</button>
-            
-            <AnimatePresence mode="wait">
-              {loading ? (
-                <motion.div 
-                  className="popup-loading"
-                  key="loading"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                >
-                  <Preloader />
-                </motion.div>
-              ) : error ? (
-                <motion.div 
-                  className="popup-error"
-                  key="error"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                >
-                  {error}
-                </motion.div>
-              ) : pokemonData && (
-                <motion.div 
-                  className="pokemon-details"
-                  key="content"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                >
-                  <div className="pokemon-header">
-                    <h2>{pokemonData.name}</h2>
-                    <span>#{pokemonData.id.toString().padStart(3, '0')}</span>
-                  </div>
-                  
+          <button className="popup-nav prev" onClick={() => onNavigate('prev')}>&lt;</button>
+          {isLoading ? (
+            <div className="popup-loading">
+              <Preloader />
+            </div>
+          ) : (
+            <motion.div
+              className="popup-content"
+            >
+              <button className="popup-close" onClick={onClose}>&times;</button>
+              <AnimatePresence mode="wait">
+                {error ? (
                   <motion.div 
-                    className="pokemon-image-container"
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: "spring", duration: 0.5 }}
+                    className="popup-error"
+                    key="error"
                   >
-                    <img 
-                      src={pokemonData.sprites.other['official-artwork'].front_default}
-                      alt={pokemonData.name}
-                      className="pokemon-detail-image"
-                    />
+                    {error}
                   </motion.div>
-
-                  <div className="pokemon-info">
-                    <div className="pokemon-types">
-                      {pokemonData.types.map(type => (
-                        <motion.span 
-                          key={type.type.name} 
-                          className={`type-badge ${type.type.name}`}
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          transition={{ delay: 0.2 }}
-                        >
-                          {type.type.name}
-                        </motion.span>
-                      ))}
+                ) : pokemonData && (
+                  <motion.div 
+                    className="pokemon-details"
+                    key="content"
+                  >
+                    <div className="pokemon-header">
+                      <h2>{pokemonData.name}</h2>
+                      <span>#{pokemonData.id.toString().padStart(3, '0')}</span>
                     </div>
-
-                    <div className="pokemon-stats">
-                      {pokemonData.stats.map((stat, index) => (
-                        <motion.div 
-                          key={stat.stat.name} 
-                          className="stat-row"
-                          initial={{ x: -50, opacity: 0 }}
-                          animate={{ x: 0, opacity: 1 }}
-                          transition={{ delay: index * 0.1 }}
-                        >
-                          <span className="stat-name">{stat.stat.name}</span>
-                          <div className="stat-bar-container">
-                            <motion.div 
-                              className="stat-bar"
-                              initial={{ width: 0 }}
-                              animate={{ width: `${(stat.base_stat / 255) * 100}%` }}
-                              transition={{ duration: 1, delay: 0.5 + index * 0.1 }}
-                            />
-                          </div>
-                          <span className="stat-value">{stat.base_stat}</span>
-                        </motion.div>
-                      ))}
-                    </div>
-
+                    
                     <motion.div 
-                      className="pokemon-abilities"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 1 }}
+                      className="popup-image-container"
                     >
-                      <h3>Habilidades</h3>
-                      <div className="abilities-list">
-                        {pokemonData.abilities.map((ability, index) => (
+                      <img 
+                        src={pokemonData.sprites.other['official-artwork'].front_default}
+                        alt={pokemonData.name}
+                        className="pokemon-detail-image"
+                      />
+                    </motion.div>
+
+                    <div className="pokemon-info">
+                      <div className="pokemon-types">
+                        {pokemonData.types.map(type => (
                           <motion.span 
-                            key={ability.ability.name} 
-                            className="ability-badge"
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            transition={{ delay: 1.2 + index * 0.1 }}
+                            key={type.type.name} 
+                            className={`type-badge ${type.type.name}`}
                           >
-                            {ability.ability.name}
+                            {type.type.name}
                           </motion.span>
                         ))}
                       </div>
-                    </motion.div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
+
+                      <div className="pokemon-stats">
+                        {pokemonData.stats.map((stat) => (
+                          <motion.div 
+                            key={stat.stat.name} 
+                            className="stat-row"
+                          >
+                            <span className="stat-name">{stat.stat.name}</span>
+                            <div className="stat-bar-container">
+                              <motion.div 
+                                className="stat-bar"
+                                style={{ width: `${(stat.base_stat / 255) * 100}%` }}
+                              />
+                            </div>
+                            <span className="stat-value">{stat.base_stat}</span>
+                          </motion.div>
+                        ))}
+                      </div>
+
+                      <motion.div 
+                        className="pokemon-abilities"
+                      >
+                        <h3>Habilidades</h3>
+                        <div className="abilities-list">
+                          {pokemonData.abilities.map((ability) => (
+                            <motion.span 
+                              key={ability.ability.name} 
+                              className="ability-badge"
+                            >
+                              {ability.ability.name}
+                            </motion.span>
+                          ))}
+                        </div>
+                      </motion.div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          )}
+          <button className="popup-nav next" onClick={() => onNavigate('next')}>&gt;</button>
         </motion.div>
       )}
     </AnimatePresence>

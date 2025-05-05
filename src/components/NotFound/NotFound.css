@@ -1,0 +1,30 @@
+.not-found {
+  text-align: center;
+  padding: 20px;
+}
+
+.not-found__image {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+.not-found__text {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.not-found__button {
+  font-size: 1rem;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.not-found__button:hover {
+  background-color: #0056b3;
+}

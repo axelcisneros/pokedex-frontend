@@ -1,39 +1,94 @@
 .popup-overlay {
   position: fixed;
   inset: 0;
-  background-color: var(--color-text-dark);
+  background-color: rgba(0, 0, 0, 0.8); /* Transparencia permitida */
+  opacity: 1 !important; /* Asegurar que no haya transparencia */
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1;
+  z-index: 2; /* Mantener el valor permitido */
+  pointer-events: auto; /* Permitir interacción solo con el popup */
+}
+
+.popup-overlay .popup-loading {
+  pointer-events: all; /* Permitir interacción con el preloader */
+}
+
+body.popup-open {
+  overflow: hidden;
+}
+
+.hidden-background {
+  pointer-events: none; /* Deshabilitar interacción con el fondo */
+  filter: none; /* Mantener el fondo visible sin cambios */
+  opacity: 1; /* Asegurar que las imágenes permanezcan visibles */
+}
+
+/* Asegurar que el contenido principal no desaparezca */
+#root {
+  visibility: visible; /* Mantener visible el contenido principal */
 }
 
 .popup-content {
-  background-color: var(--color-text-light);
+  background-color: #ffffff !important; /* Fondo blanco sólido */
   border-radius: 20px;
-  padding: 30px;
+  padding: 10px; /* Reducir el padding para optimizar el espacio */
   position: relative;
   width: 90%;
   max-width: 600px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 4px 20px 0 #00000033;
+  max-height: 85vh; /* Ajusté la altura máxima para evitar cortes */
+  overflow: hidden; /* Evitar el scroll */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 1) !important; /* Sombra completamente opaca */
+  opacity: 1 !important; /* Sin transparencia */
+}
+
+.popup-content * {
+  opacity: 1 !important; /* Forzar opacidad de todos los elementos secundarios */
 }
 
 .popup-close {
   position: absolute;
-  top: 15px;
-  right: 15px;
+  top: 10px;
+  right: 10px;
   width: 32px;
   height: 32px;
   padding: 0;
   background: none;
   border: none;
-  color: var(--color-secondary);
+  color: var(--color-primary);
   cursor: pointer;
-  transition-property: color;
-  transition-duration: var(--transition-normal);
-  transition-timing-function: ease;
+  font-size: 1.5rem;
+}
+
+.popup-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  opacity: 0.8; /* Transparencia permitida */
+}
+
+.pokeball-animation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, #f00 50%, #fff 50%);
+  border-radius: 50%;
+  animation: openPokeball 1s ease-in-out forwards;
+}
+
+@keyframes openPokeball {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0);
+  }
 }
 
 .popup-close:hover,
@@ -44,15 +99,6 @@
 .popup-close:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
-}
-
-.popup-loading {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  background-color: var(--color-text-light);
-  border-radius: 20px;
 }
 
 .popup-error {
@@ -69,7 +115,7 @@
 
 .pokemon-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   margin-bottom: 20px;
   padding-right: 40px;
@@ -78,25 +124,27 @@
 .pokemon-header h2 {
   text-transform: capitalize;
   margin: 0;
-  font-size: var(--font-size-xl);
+  padding-right: 10px;
+  font-size: 1rem; /* Reducir el tamaño del texto */
   color: var(--color-primary);
 }
 
 .pokemon-header span {
   color: var(--color-secondary);
-  font-size: var(--font-size-lg);
+  font-size: 0.9rem; /* Reducir el tamaño del número */
 }
 
-.pokemon-image-container {
+.popup-image-container {
   display: flex;
   justify-content: center;
+  align-self: center;
   margin: 20px 0;
   position: relative;
 }
 
 .pokemon-detail-image {
-  width: 200px;
-  height: 200px;
+  width: 90px; /* Reducir el tamaño de la imagen */
+  height: 90px;
   object-fit: contain;
 }
 
@@ -114,7 +162,7 @@
   color: white;
   font-size: 0.9rem;
   text-transform: capitalize;
-  box-shadow: 0 2px 4px rgb(0 0 0 / 20%);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 100%) !important; /* Sombra completamente opaca */
 }
 
 /* Estilos para los diferentes tipos de Pokémon */
@@ -140,16 +188,16 @@
 .pokemon-stats {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 4px; /* Reducir el espacio entre los elementos */
   margin: 20px 0;
-  padding: 20px;
+  padding: 5px; /* Reducir el padding */
   background-color: var(--color-background);
   border-radius: 15px;
 }
 
 .stat-row {
   display: grid;
-  grid-template-columns: 100px 1fr 50px;
+  grid-template-columns: 50px 1fr 20px; /* Ajustar las proporciones de las columnas */
   align-items: center;
   gap: 10px;
 }
@@ -157,7 +205,7 @@
 .stat-name {
   text-transform: capitalize;
   color: var(--color-secondary);
-  font-size: var(--font-size-sm);
+  font-size: 0.6rem; /* Reducir el tamaño del texto */
 }
 
 .stat-bar-container {
@@ -169,17 +217,19 @@
 
 .stat-bar {
   height: 100%;
-  background: var(--color-accent);
+  background: var(--color-accent) !important;
   border-radius: 4px;
   transition-property: width;
   transition-duration: var(--transition-normal);
   transition-timing-function: ease-out;
+  opacity: 1 !important; /* Asegurar que sea completamente opaco */
 }
 
 .stat-value {
   color: var(--color-primary);
   font-weight: bold;
   text-align: right;
+  font-size: 0.6rem; /* Reducir el tamaño del texto */
 }
 
 .pokemon-abilities {
@@ -195,18 +245,19 @@
 .abilities-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 2px; /* Reducir el espacio entre las habilidades */
   justify-content: center;
 }
 
 .ability-badge {
-  background-color: var(--color-background);
-  padding: 5px 15px;
+  background-color: var(--color-background) !important;
+  padding: 1px 5px; /* Reducir el padding */
   border-radius: 15px;
-  font-size: var(--font-size-sm);
+  font-size: 0.6rem; /* Reducir el tamaño del texto */
   color: var(--color-primary);
   text-transform: capitalize;
   transition: transform var(--transition-fast), background-color var(--transition-fast);
+  opacity: 1 !important; /* Asegurar que sea completamente opaco */
 }
 
 .ability-badge:hover {
@@ -232,6 +283,30 @@
 
 .popup-content::-webkit-scrollbar-thumb:hover {
   background-color: var(--color-accent-dark);
+}
+
+.popup-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+.popup-nav.prev {
+  left: 400px;
+  color: #000;
+  background-color: rgba(255, 255, 255, 0.5); /* Fondo blanco con opacidad */
+}
+
+.popup-nav.next {
+  right: 400px;
+  color: #000;
+  background-color: rgba(255, 255, 255, 0.5); /* Fondo blanco con opacidad */
 }
 
 @media (max-width: 768px) {

@@ -26,3 +26,67 @@ export const getPokemonDetails = async (id) => {
 export const getPokemonImage = (id) => {
   return `${SPRITE_URL}${id}.png`;
 };
+
+export const getHighQualitySprite = (id) => {
+  return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
+};
+
+export const fetchTypePokemons = async (types) => {
+  try {
+    const promises = types.map(async (type) => {
+      const url = `${BASE_URL}/type/${type}`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`Error al obtener Pokémon por tipo: ${type}`);
+      const data = await response.json();
+      return data.pokemon.map((p) => p.pokemon.name);
+    });
+
+    const results = await Promise.all(promises);
+    return results.flat();
+  } catch (error) {
+    console.error('Error al obtener Pokémon por tipo:', error);
+    return [];
+  }
+};
+
+export const fetchGenerationPokemons = async (generations) => {
+  try {
+    const promises = generations.map(async (generation) => {
+      const url = `${BASE_URL}/generation/${generation}`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`Error al obtener Pokémon por generación: ${generation}`);
+      const data = await response.json();
+      return data.pokemon_species.map((p) => p.name);
+    });
+
+    const results = await Promise.all(promises);
+    return results.flat();
+  } catch (error) {
+    console.error('Error al obtener Pokémon por generación:', error);
+    return [];
+  }
+};
+
+export const getFilterData = async () => {
+  try {
+    const typeResponse = await fetch(`${BASE_URL}/type`);
+    const generationResponse = await fetch(`${BASE_URL}/generation`);
+
+    if (!typeResponse.ok || !generationResponse.ok) {
+      throw new Error('Error fetching filter data');
+    }
+
+    const typeData = await typeResponse.json();
+    const generationData = await generationResponse.json();
+
+    return {
+      types: typeData.results,
+      generations: generationData.results,
+    };
+  } catch (error) {
+    console.error('Error fetching filter data:', error);
+    throw error;
+  }
+};
+
+export { BASE_URL };

@@ -1,16 +1,19 @@
 .pokeball-preloader {
-  width: 60px;
-  height: 60px;
-  background-color: var(--color-text-light);
+  width: 80px;
+  height: 80px;
+  background-color: transparent; /* Eliminé el fondo del preloader */
   border-radius: 50%;
-  position: relative;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   overflow: hidden;
   border: 3px solid var(--color-text-dark);
   animation-name: shake;
   animation-duration: 1.25s;
   animation-timing-function: cubic-bezier(.36,.07,.19,.97);
   animation-iteration-count: infinite;
-  transform: translate3d(0, 0, 0);
+  z-index: 1; /* Mantener el valor permitido */
 }
 
 .pokeball-preloader::before {

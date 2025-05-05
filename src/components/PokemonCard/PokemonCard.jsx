@@ -1,10 +1,10 @@
 import { motion } from 'framer-motion';
 import './PokemonCard.css';
-import { getPokemonImage } from '../../utils/PokeApi.js';
+import { getHighQualitySprite } from '../../utils/pokeapi.js';
 
 function PokemonCard({ pokemon, onCardClick, onFavoriteClick, isFavorite }) {
   const pokemonId = pokemon.url.split('/')[6];
-  const imageUrl = getPokemonImage(pokemonId);
+  const imageUrl = getHighQualitySprite(pokemonId);
 
   const handleFavoriteClick = (e) => {
     e.stopPropagation();
@@ -29,7 +29,7 @@ function PokemonCard({ pokemon, onCardClick, onFavoriteClick, isFavorite }) {
         </svg>
       </button>
 
-      <div className="pokemon-image-container">
+      <div className="card-image-container">
         <motion.img 
           src={imageUrl} 
           alt={pokemon.name}

@@ -5,10 +5,13 @@ import Header from '../Header/Header';
 import Main from '../Main/Main';
 import Footer from '../Footer/Footer';
 import Preloader from '../Preloader/Preloader';
+import NotFound from '../NotFound/NotFound';
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [favorites, setFavorites] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filter, setFilter] = useState('');
 
   useEffect(() => {
     // Cargar favoritos del localStorage
@@ -41,6 +44,14 @@ function App() {
     });
   };
 
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+  };
+
+  const handleFilter = (selectedFilter) => {
+    setFilter(selectedFilter);
+  };
+
   return (
     <div className="app">
       {isLoading ? (
@@ -49,30 +60,40 @@ function App() {
         </div>
       ) : (
         <>
-          <Header />
-          <Routes>
-            <Route 
-              path="/" 
-              element={
-                <Main 
-                  showFavorites={false} 
-                  favorites={favorites}
-                  onToggleFavorite={handleToggleFavorite}
-                />
-              } 
-            />
-            <Route 
-              path="/favorites" 
-              element={
-                <Main 
-                  showFavorites={true} 
-                  favorites={favorites}
-                  onToggleFavorite={handleToggleFavorite}
-                />
-              } 
-            />
-          </Routes>
-          <Footer />
+          <div className="app__content" style={{ display: isLoading ? 'none' : 'block' }}>
+            <Header onSearch={handleSearch} onFilter={handleFilter} />
+            <Routes>
+              <Route 
+                path="/" 
+                element={
+                  <Main 
+                    showFavorites={false} 
+                    favorites={favorites}
+                    onToggleFavorite={handleToggleFavorite}
+                    searchQuery={searchQuery}
+                    filter={filter}
+                  />
+                } 
+              />
+              <Route 
+                path="/favorites" 
+                element={
+                  <Main 
+                    showFavorites={true} 
+                    favorites={favorites}
+                    onToggleFavorite={handleToggleFavorite}
+                    searchQuery={searchQuery}
+                    filter={filter}
+                  />
+                } 
+              />
+              <Route 
+                path="*" 
+                element={<NotFound />} 
+              />
+            </Routes>
+            <Footer />
+          </div>
         </>
       )}
     </div>
