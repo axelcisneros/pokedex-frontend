@@ -1,0 +1,66 @@
+.pokeball-preloader {
+  width: 80px;
+  height: 80px;
+  background-color: transparent; /* Eliminé el fondo del preloader */
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  overflow: hidden;
+  border: 3px solid var(--color-text-dark);
+  animation-name: shake;
+  animation-duration: 1.25s;
+  animation-timing-function: cubic-bezier(.36,.07,.19,.97);
+  animation-iteration-count: infinite;
+  z-index: 1; /* Mantener el valor permitido */
+}
+
+.pokeball-preloader::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 50% 0;
+  background-color: var(--color-accent);
+  border-bottom: 3px solid var(--color-text-dark);
+}
+
+.pokeball-preloader::after {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background-color: var(--color-text-light);
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 3px solid var(--color-text-dark);
+  box-shadow: var(--shadow-sm);
+}
+
+@keyframes shake {
+  0% { 
+    transform: translate3d(0, 0, 0) rotate(0); 
+  }
+  20% { 
+    transform: translate3d(-10px, 0, 0) rotate(-20deg); 
+  }
+  30% { 
+    transform: translate3d(10px, 0, 0) rotate(20deg); 
+  }
+  50% { 
+    transform: translate3d(-10px, 0, 0) rotate(-10deg); 
+  }
+  60% { 
+    transform: translate3d(10px, 0, 0) rotate(10deg); 
+  }
+  100% { 
+    transform: translate3d(0, 0, 0) rotate(0); 
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pokeball-preloader {
+    animation: none;
+  }
+}
