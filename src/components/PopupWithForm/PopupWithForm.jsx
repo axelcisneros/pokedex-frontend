@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './PopupWithForm.css';
-import { getPokemonDetails } from '../../utils/pokeapi';
+import { getPokemonDetails } from '../../utils/MainApi';
 import Preloader from '../Preloader/Preloader';
 
 function PopupWithForm({ isOpen, onClose, pokemonUrl, onNavigate }) {

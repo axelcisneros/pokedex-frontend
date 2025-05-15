@@ -3,7 +3,7 @@ import './Header.css';
 import Navigation from '../Navigation/Navigation';
 import SearchBar from '../SearchBar/SearchBar';
 import Select from '../Select/Select';
-import { getFilterData } from '../../utils/pokeapi';
+import { getFilterData } from '../../utils/MainApi';
 
 function Header({ onSearch, onFilter }) {
   const [types, setTypes] = useState([]);

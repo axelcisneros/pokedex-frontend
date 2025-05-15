@@ -7,7 +7,7 @@ function Footer() {
     <footer className="footer">
       <div className="footer__container">
         <p className="footer__text">
-          &copy; {currentYear} Pokédex. Built with PokeAPI and React. All rights reserved. By Axel Cisneros.
+          &copy; {currentYear} Pokédex. Backend propio + PokeAPI + React. All rights reserved. By Axel Cisneros.
         </p>
       </div>
     </footer>

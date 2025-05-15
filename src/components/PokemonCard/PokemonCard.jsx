@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import './PokemonCard.css';
-import { getHighQualitySprite } from '../../utils/pokeapi.js';
+import { getHighQualitySprite } from '../../utils/MainApi.js';
 
 function PokemonCard({ pokemon, onCardClick, onFavoriteClick, isFavorite }) {
   const pokemonId = pokemon.url.split('/')[6];

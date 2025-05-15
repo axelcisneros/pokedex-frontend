@@ -1,6 +1,16 @@
 # Proyecto Final Frontend
 
-Este proyecto es una aplicación web desarrollada como parte del proyecto final del curso. Es una Pokedex interactiva que permite a los usuarios buscar y explorar información sobre diferentes Pokémon.
+Esta aplicación es una Pokedex interactiva que permite a los usuarios buscar y explorar información sobre diferentes Pokémon. Ahora, toda la comunicación de datos se realiza exclusivamente a través del backend propio, el cual centraliza las llamadas a PokeAPI y la API de sprites de Pokémon.
+
+## Arquitectura y conexión
+
+- El frontend **no realiza llamadas directas a PokeAPI** ni a la API de sprites. Todas las solicitudes (Pokémon, usuarios, registro, login, etc.) se hacen al backend propio.
+- El backend se encarga de obtener los datos de PokeAPI y de la API de sprites, y los expone mediante endpoints propios.
+- El frontend utiliza el archivo `src/utils/MainApi.js` para gestionar todas las llamadas al backend.
+
+## Link de acceso
+
+- [Coloca aquí el link de despliegue del frontend]
 
 ## Capturas del Proyecto
 

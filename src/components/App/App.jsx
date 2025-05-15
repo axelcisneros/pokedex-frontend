@@ -5,7 +5,6 @@ import Header from '../Header/Header';
 import Main from '../Main/Main';
 import Footer from '../Footer/Footer';
 import Preloader from '../Preloader/Preloader';
-import NotFound from '../NotFound/NotFound';
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -64,32 +63,15 @@ function App() {
             <Header onSearch={handleSearch} onFilter={handleFilter} />
             <Routes>
               <Route 
-                path="/" 
-                element={
-                  <Main 
-                    showFavorites={false} 
-                    favorites={favorites}
-                    onToggleFavorite={handleToggleFavorite}
-                    searchQuery={searchQuery}
-                    filter={filter}
-                  />
-                } 
-              />
-              <Route 
-                path="/favorites" 
-                element={
-                  <Main 
-                    showFavorites={true} 
-                    favorites={favorites}
-                    onToggleFavorite={handleToggleFavorite}
-                    searchQuery={searchQuery}
-                    filter={filter}
-                  />
-                } 
-              />
-              <Route 
                 path="*" 
-                element={<NotFound />} 
+                element={
+                  <Main 
+                    favorites={favorites}
+                    onToggleFavorite={handleToggleFavorite}
+                    searchQuery={searchQuery}
+                    filter={filter}
+                  />
+                } 
               />
             </Routes>
             <Footer />

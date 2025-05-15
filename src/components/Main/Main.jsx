@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Route, Routes } from 'react-router-dom';
-import { getPokemonList, getPokemonImage, fetchTypePokemons } from '../../utils/pokeapi';
+import { getPokemonList, getPokemonImage, fetchTypePokemons } from '../../utils/MainApi';
 import './Main.css';
 import PokemonList from '../PokemonList/PokemonList';
 import Preloader from '../Preloader/Preloader';
@@ -16,139 +16,72 @@ function Main({ favorites, onToggleFavorite, searchQuery, filter }) {
   const [isSearching, setIsSearching] = useState(false);
   const [apiError, setApiError] = useState(false);
 
+  // Cargar todos los pokémon solo una vez
   useEffect(() => {
-    const fetchPokemons = async () => {
-      try {
-        if (pokemons.length > 0) return;
-
-        const data = await getPokemonList(0, 1000);
-        const basicPokemons = data.results.map((pokemon) => {
-          const id = pokemon.url.split('/')[6];
-          return {
-            ...pokemon,
-            id,
-            sprite: getPokemonImage(id),
-          };
-        });
-        setPokemons(basicPokemons);
-        setFilteredPokemons(basicPokemons);
-      } catch (error) {
-        if (error.response && error.response.status >= 400 && error.response.status < 500) {
+    if (!showFavorites && pokemons.length === 0) {
+      setIsSearching(true);
+      getPokemonList(0, 1000)
+        .then((data) => {
+          const basicPokemons = data.results.map((pokemon) => {
+            const id = pokemon.url.split('/')[6];
+            return {
+              ...pokemon,
+              id,
+              sprite: getPokemonImage(id),
+            };
+          });
+          setPokemons(basicPokemons);
+          setFilteredPokemons(basicPokemons);
+        })
+        .catch((error) => {
           setApiError(true);
-        } else {
           console.error('Error al cargar la lista de Pokémon:', error);
-        }
-      }
-    };
-
-    if (!showFavorites) {
-      fetchPokemons();
-    } else {
+        })
+        .finally(() => setIsSearching(false));
+    }
+    if (showFavorites) {
       setFilteredPokemons(favorites);
     }
   }, [showFavorites, favorites, pokemons.length]);
 
-  useEffect(() => {
-    const applyFilter = async () => {
-      setIsSearching(true);
-      setApiError(false);
-
-      let filtered = [];
-
-      if (searchQuery) {
-        try {
-          if (showFavorites) {
-            filtered = favorites.filter((pokemon) => {
-              const matchesName = pokemon.name.toLowerCase().includes(searchQuery.toLowerCase());
-              const matchesId = pokemon.id === searchQuery;
-              return matchesName || matchesId;
-            });
-          } else {
-            if (searchQuery.match(/^[a-zA-Z]+$/)) {
-              filtered = await fetchTypePokemons(searchQuery.toLowerCase());
-            } else {
-              filtered = pokemons.filter((pokemon) => {
-                const matchesName = pokemon.name.toLowerCase().includes(searchQuery.toLowerCase());
-                const matchesId = pokemon.id === searchQuery;
-                return matchesName || matchesId;
-              });
-            }
-          }
-        } catch (error) {
-          if (error.response && error.response.status >= 400 && error.response.status < 500) {
-            setApiError(true);
-          } else {
-            console.error('Error al filtrar Pokémon:', error);
-          }
-        }
-      } else {
-        filtered = showFavorites ? favorites : pokemons;
-      }
-
-      if (filtered.length === 0 && !apiError) {
-        setApiError(true);
-      }
-
-      setFilteredPokemons(filtered);
-      setTimeout(() => setIsSearching(false), 500);
-    };
-
-    applyFilter();
-  }, [searchQuery, showFavorites, favorites, pokemons, apiError]);
-
-  // Eliminar lógica de filtro de generación
-  useEffect(() => {
-    const applyFilter = async () => {
-      setIsSearching(true);
-
-      let filtered = pokemons;
-
-      if (filter) {
-        const { types = [] } = filter;
-
-        if (types.length > 0) {
-          const typePokemons = await fetchTypePokemons(types);
-          filtered = filtered.filter((pokemon) => typePokemons.includes(pokemon.name));
-        }
-      }
-
-      setFilteredPokemons(filtered);
-      setTimeout(() => setIsSearching(false), 500);
-    };
-
-    applyFilter();
-  }, [filter, pokemons]);
-
-  useEffect(() => {
-    if (showFavorites) {
-      setFilteredPokemons(favorites); // Actualizar automáticamente la lista de favoritos
-    }
-  }, [favorites, showFavorites]);
-
-  // Ajustar la lógica para evitar renderizados innecesarios al agregar un favorito
+  // Un solo efecto para filtrar por búsqueda y tipos
   useEffect(() => {
     if (showFavorites) {
       setFilteredPokemons(favorites);
-    } else if (!searchQuery && filteredPokemons.length === 0 && pokemons.length > 0) {
-      setFilteredPokemons(pokemons);
+      return;
     }
-  // Corregir la advertencia agregando `filteredPokemons.length` a las dependencias
-  }, [showFavorites, searchQuery, pokemons, favorites, filteredPokemons.length]);
+    let filtered = pokemons;
+    let filterPromise = Promise.resolve(filtered);
 
-  // Evitar que la lista "Todos" se actualice innecesariamente al agregar un favorito
-  useEffect(() => {
-    if (!showFavorites && filteredPokemons.length === 0 && pokemons.length > 0) {
-      setFilteredPokemons(pokemons);
+    if (filter && filter.types && filter.types.length > 0) {
+      filterPromise = fetchTypePokemons(filter.types).then((result) => {
+        if (result && result.pokemons) {
+          return filtered.filter((pokemon) => result.pokemons.some((p) => p.name === pokemon.name));
+        }
+        return filtered;
+      });
     }
-  }, [showFavorites, pokemons, filteredPokemons]);
 
-// Ajustar la función resetToAllPokemons para cambiar la ruta al regresar a la lista completa sin mover su posición
-const resetToAllPokemons = () => {
-  setFilteredPokemons(pokemons);
-  if (showFavorites) {
-    navigate('/'); // Cambiar la ruta a la lista completa
-  }
-};
+    filterPromise.then((filteredByType) => {
+      let finalFiltered = filteredByType;
+      if (searchQuery) {
+        finalFiltered = finalFiltered.filter((pokemon) => {
+          const matchesName = pokemon.name.toLowerCase().includes(searchQuery.toLowerCase());
+          const matchesId = pokemon.id === searchQuery;
+          return matchesName || matchesId;
+        });
+      }
+      setFilteredPokemons(finalFiltered);
+      setApiError(finalFiltered.length === 0);
+    });
+  }, [searchQuery, filter, pokemons, favorites, showFavorites]);
+
+  const resetToAllPokemons = () => {
+    setFilteredPokemons(pokemons);
+    if (showFavorites) {
+      navigate('/');
+    }
+  };
 
   return (
     <main className="main">
