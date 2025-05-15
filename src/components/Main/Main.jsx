@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useLocation, useNavigate, Route, Routes } from 'react-router-dom';
 import { getPokemonList, getPokemonImage, fetchTypePokemons } from '../../utils/MainApi';
 import './Main.css';
@@ -6,8 +6,11 @@ import PokemonList from '../PokemonList/PokemonList';
 import Preloader from '../Preloader/Preloader';
 import Button from '../Button/Button';
 import NotFound from '../NotFound/NotFound';
+import UserContext from '../../context/UserContext';
+import LoginRegister from '../Auth/LoginRegister';
 
 function Main({ favorites, onToggleFavorite, searchQuery, filter }) {
+  const { isLoggedIn } = useContext(UserContext);
   const location = useLocation();
   const navigate = useNavigate();
   const showFavorites = location.pathname === '/favorites';
@@ -15,19 +18,30 @@ function Main({ favorites, onToggleFavorite, searchQuery, filter }) {
   const [filteredPokemons, setFilteredPokemons] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [apiError, setApiError] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   // Cargar todos los pokémon solo una vez
   useEffect(() => {
+    if (showFavorites && !isLoggedIn) {
+      navigate('/');
+      alert('Debes iniciar sesión para ver tus favoritos.');
+    }
     if (!showFavorites && pokemons.length === 0) {
       setIsSearching(true);
       getPokemonList(0, 1000)
         .then((data) => {
+          if (!data || !Array.isArray(data.results)) {
+            setApiError(true);
+            setPokemons([]);
+            setFilteredPokemons([]);
+            return;
+          }
           const basicPokemons = data.results.map((pokemon) => {
             const id = pokemon.url.split('/')[6];
             return {
               ...pokemon,
               id,
-              sprite: getPokemonImage(id),
+              sprite: pokemon.sprite || getPokemonImage(id),
             };
           });
           setPokemons(basicPokemons);
@@ -35,6 +49,8 @@ function Main({ favorites, onToggleFavorite, searchQuery, filter }) {
         })
         .catch((error) => {
           setApiError(true);
+          setPokemons([]);
+          setFilteredPokemons([]);
           console.error('Error al cargar la lista de Pokémon:', error);
         })
         .finally(() => setIsSearching(false));
@@ -42,7 +58,7 @@ function Main({ favorites, onToggleFavorite, searchQuery, filter }) {
     if (showFavorites) {
       setFilteredPokemons(favorites);
     }
-  }, [showFavorites, favorites, pokemons.length]);
+  }, [showFavorites, favorites, pokemons.length, isLoggedIn, navigate]);
 
   // Un solo efecto para filtrar por búsqueda y tipos
   useEffect(() => {
@@ -56,9 +72,17 @@ function Main({ favorites, onToggleFavorite, searchQuery, filter }) {
     if (filter && filter.types && filter.types.length > 0) {
       filterPromise = fetchTypePokemons(filter.types).then((result) => {
         if (result && result.pokemons) {
-          return filtered.filter((pokemon) => result.pokemons.some((p) => p.name === pokemon.name));
+          // Mapear los pokemons devueltos por el backend y agregar el sprite
+          return result.pokemons.map((poke) => {
+            const id = poke.url ? poke.url.split('/')[6] : poke.name;
+            return {
+              ...poke,
+              id,
+              sprite: getPokemonImage(id),
+            };
+          });
         }
-        return filtered;
+        return [];
       });
     }
 
@@ -83,9 +107,19 @@ function Main({ favorites, onToggleFavorite, searchQuery, filter }) {
     }
   };
 
+  // Modifica el handler de favoritos para usuarios no logueados
+  const handleToggleFavoriteProtected = (pokemon) => {
+    if (!isLoggedIn) {
+      setShowLoginPrompt(true);
+      return;
+    }
+    onToggleFavorite(pokemon);
+  };
+
   return (
     <main className="main">
       <section className="main__content">
+        {showLoginPrompt && <LoginRegister onClose={() => setShowLoginPrompt(false)} />}
         {isSearching ? (
           <div className="preloader-container">
             <Preloader />
@@ -104,7 +138,7 @@ function Main({ favorites, onToggleFavorite, searchQuery, filter }) {
                   <PokemonList 
                     showOnlyFavorites={showFavorites}
                     favorites={favorites}
-                    onToggleFavorite={onToggleFavorite}
+                    onToggleFavorite={handleToggleFavoriteProtected}
                     pokemons={filteredPokemons}
                   />
                 </>
@@ -125,7 +159,7 @@ function Main({ favorites, onToggleFavorite, searchQuery, filter }) {
                     <PokemonList 
                       showOnlyFavorites={showFavorites}
                       favorites={favorites}
-                      onToggleFavorite={onToggleFavorite}
+                      onToggleFavorite={handleToggleFavoriteProtected}
                       pokemons={filteredPokemons}
                     />
                   </>

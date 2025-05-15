@@ -1,0 +1,111 @@
+import { useState, useContext, useEffect } from 'react';
+import UserContext from '../../context/UserContext';
+import { login, register } from '../../utils/MainApi';
+import './LoginRegister.css';
+
+function LoginRegister({ onClose }) {
+  const { setUser, setIsLoggedIn, setToken } = useContext(UserContext);
+  const [isLogin, setIsLogin] = useState(true);
+  const [form, setForm] = useState({ name: '', email: '', password: '' });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  // Evita el scroll de fondo al abrir el modal
+  useEffect(() => {
+    document.body.classList.add('modal-open');
+    return () => {
+      document.body.classList.remove('modal-open');
+    };
+  }, []);
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    try {
+      if (isLogin) {
+        const data = await login(form.email, form.password);
+        if (data.token) {
+          setToken(data.token);
+          localStorage.setItem('jwt', data.token);
+          setIsLoggedIn(true);
+          setUser(data.user || null);
+          onClose();
+        } else {
+          setError(data.message || 'Error al iniciar sesión');
+        }
+      } else {
+        const data = await register(form.name, form.email, form.password);
+        if (data._id || data.email) {
+          setIsLogin(true);
+        } else {
+          setError(data.message || 'Error al registrarse');
+        }
+      }
+    } catch {
+      setError('Error de red o del servidor');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="auth-modal">
+      <div className="auth-modal__content">
+        <button className="auth-modal__close" onClick={onClose}>&times;</button>
+        <h2>{isLogin ? 'Iniciar sesión' : 'Registrarse'}</h2>
+        <form onSubmit={handleSubmit} className="auth-modal__form">
+          {!isLogin && (
+            <input
+              type="text"
+              name="name"
+              placeholder="Nombre"
+              value={form.name}
+              onChange={handleChange}
+              required
+            />
+          )}
+          <input
+            type="email"
+            name="email"
+            placeholder="Correo electrónico"
+            value={form.email}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Contraseña"
+            value={form.password}
+            onChange={handleChange}
+            required
+          />
+          {error && <div className="auth-modal__error">{error}</div>}
+          <button type="submit" disabled={loading} className="auth-modal__submit">
+            {loading ? 'Cargando...' : isLogin ? 'Entrar' : 'Registrarse'}
+          </button>
+        </form>
+        <div className="auth-modal__switch">
+          {isLogin ? (
+            <>
+              ¿No tienes cuenta?{' '}
+              <button type="button" onClick={() => setIsLogin(false)} className="auth-modal__link">Regístrate</button>
+            </>
+          ) : (
+            <>
+              ¿Ya tienes cuenta?{' '}
+              <button type="button" onClick={() => setIsLogin(true)} className="auth-modal__link">Inicia sesión</button>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default LoginRegister;
