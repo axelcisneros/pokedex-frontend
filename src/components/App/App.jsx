@@ -4,7 +4,6 @@ import './App.css';
 import Header from '../Header/Header';
 import Main from '../Main/Main';
 import Footer from '../Footer/Footer';
-import Preloader from '../Preloader/Preloader';
 import UserContext from '../../context/UserContext';
 import { getCurrentUser } from '../../utils/MainApi';
 
@@ -73,34 +72,28 @@ function App() {
     setFilter(selectedFilter);
   };
 
+  // El preloader y el modal de login se gestionan ahora en Main
   return (
     <UserContext.Provider value={{ user, setUser, isLoggedIn, setIsLoggedIn, token, setToken }}>
       <div className="app">
-        {isLoading ? (
-          <div className="app__preloader">
-            <Preloader />
-          </div>
-        ) : (
-          <>
-            <div className="app__content" style={{ display: isLoading ? 'none' : 'block' }}>
-              <Header onSearch={handleSearch} onFilter={handleFilter} />
-              <Routes>
-                <Route 
-                  path="*" 
-                  element={
-                    <Main 
-                      favorites={favorites}
-                      onToggleFavorite={handleToggleFavorite}
-                      searchQuery={searchQuery}
-                      filter={filter}
-                    />
-                  } 
+        <div className="app__content">
+          <Header onSearch={handleSearch} onFilter={handleFilter} />
+          <Routes>
+            <Route 
+              path="*" 
+              element={
+                <Main 
+                  favorites={favorites}
+                  onToggleFavorite={handleToggleFavorite}
+                  searchQuery={searchQuery}
+                  filter={filter}
+                  isLoading={isLoading}
                 />
-              </Routes>
-              <Footer />
-            </div>
-          </>
-        )}
+              } 
+            />
+          </Routes>
+          <Footer />
+        </div>
       </div>
     </UserContext.Provider>
   );

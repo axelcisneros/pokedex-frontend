@@ -21,6 +21,17 @@
   background-color: var(--color-background);
 }
 
+.main__preloader-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2000;
+  background: #fff !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1 !important;
+}
+
 @media (max-width: 768px) {
   .main {
     min-height: calc(100vh - 120px);

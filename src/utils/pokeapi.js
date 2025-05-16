@@ -1,4 +1,3 @@
-// Elimina este archivo, toda la lógica de llamadas a la API ahora está en MainApi.js y es gestionada por el backend.
 const BASE_URL = 'https://pokeapi.co/api/v2';
 const SPRITE_URL = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/';
 

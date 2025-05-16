@@ -26,6 +26,7 @@ function Main({ favorites, onToggleFavorite, searchQuery, filter }) {
       navigate('/');
       alert('Debes iniciar sesión para ver tus favoritos.');
     }
+    // Solo cargar pokemons si no se han cargado antes
     if (!showFavorites && pokemons.length === 0) {
       setIsSearching(true);
       getPokemonList(0, 1000)
@@ -54,8 +55,7 @@ function Main({ favorites, onToggleFavorite, searchQuery, filter }) {
           console.error('Error al cargar la lista de Pokémon:', error);
         })
         .finally(() => setIsSearching(false));
-    }
-    if (showFavorites) {
+    } else if (showFavorites) {
       setFilteredPokemons(favorites);
     }
   }, [showFavorites, favorites, pokemons.length, isLoggedIn, navigate]);
@@ -128,7 +128,7 @@ function Main({ favorites, onToggleFavorite, searchQuery, filter }) {
           <Routes>
             <Route
               path="/favorites"
-              element={
+              element={(
                 <>
                   {(searchQuery || showFavorites) && (
                     <Button onClick={resetToAllPokemons} className="button main__reset-button">
@@ -142,11 +142,11 @@ function Main({ favorites, onToggleFavorite, searchQuery, filter }) {
                     pokemons={filteredPokemons}
                   />
                 </>
-              }
+              )}
             />
             <Route
               path="/"
-              element={
+              element={(
                 apiError ? (
                   <NotFound />
                 ) : (
@@ -164,7 +164,7 @@ function Main({ favorites, onToggleFavorite, searchQuery, filter }) {
                     />
                   </>
                 )
-              }
+              )}
             />
             <Route path="*" element={<NotFound />} />
           </Routes>

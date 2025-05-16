@@ -1,7 +1,7 @@
 .pokeball-preloader {
   width: 80px;
   height: 80px;
-  background-color: transparent; /* Eliminé el fondo del preloader */
+  background-color: #fff !important;
   border-radius: 50%;
   position: absolute;
   top: 50%;

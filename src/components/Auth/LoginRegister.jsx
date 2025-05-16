@@ -13,10 +13,23 @@ function LoginRegister({ onClose }) {
   // Evita el scroll de fondo al abrir el modal
   useEffect(() => {
     document.body.classList.add('modal-open');
+    const handleEscClose = (e) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    document.addEventListener('keydown', handleEscClose);
     return () => {
       document.body.classList.remove('modal-open');
+      document.removeEventListener('keydown', handleEscClose);
     };
-  }, []);
+  }, [onClose]);
+
+  const handleOverlayClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -54,8 +67,8 @@ function LoginRegister({ onClose }) {
   };
 
   return (
-    <div className="auth-modal">
-      <div className="auth-modal__content">
+    <div className="auth-modal" onClick={handleOverlayClick}>
+      <div className="auth-modal__content" onClick={e => e.stopPropagation()}>
         <button className="auth-modal__close" onClick={onClose}>&times;</button>
         <h2>{isLogin ? 'Iniciar sesión' : 'Registrarse'}</h2>
         <form onSubmit={handleSubmit} className="auth-modal__form">
