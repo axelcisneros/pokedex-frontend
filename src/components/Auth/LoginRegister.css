@@ -4,7 +4,6 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: #000 !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -13,7 +12,7 @@
 }
 
 body.modal-open {
-  overflow: hidden !important;
+  overflow: hidden;
 }
 
 .auth-modal__content {

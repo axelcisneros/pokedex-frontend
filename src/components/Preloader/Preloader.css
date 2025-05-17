@@ -1,7 +1,7 @@
 .pokeball-preloader {
   width: 80px;
   height: 80px;
-  background-color: #fff !important;
+  background-color: #fff;
   border-radius: 50%;
   position: absolute;
   top: 50%;
@@ -13,7 +13,7 @@
   animation-duration: 1.25s;
   animation-timing-function: cubic-bezier(.36,.07,.19,.97);
   animation-iteration-count: infinite;
-  z-index: 1; /* Mantener el valor permitido */
+  z-index: 1;
 }
 
 .pokeball-preloader::before {

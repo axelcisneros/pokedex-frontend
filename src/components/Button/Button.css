@@ -14,13 +14,13 @@
 }
 
 .button--disabled {
-  background-color: #d3d3d3; /* Color gris para indicar desactivado */
-  cursor: not-allowed; /* Cambia el cursor a no permitido */
-  color: #a9a9a9; /* Color del texto más claro para indicar desactivado */
-  pointer-events: none; /* Desactiva completamente el hover */
-  transition: none; /* Elimina la transición para el estado desactivado */
+  background-color: #d3d3d3;
+  cursor: not-allowed;
+  color: #a9a9a9;
+  pointer-events: none;
+  transition: none;
 }
 
 .button--disabled:hover {
-  background-color: #e0e0e0; /* Mantiene el color grisáceo en hover */
+  background-color: #e0e0e0;
 }

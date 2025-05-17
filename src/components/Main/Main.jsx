@@ -8,6 +8,8 @@ import Button from '../Button/Button';
 import NotFound from '../NotFound/NotFound';
 import UserContext from '../../context/UserContext';
 import LoginRegister from '../Auth/LoginRegister';
+import PopupWithForm from '../PopupWithForm/PopupWithForm';
+import { AnimatePresence } from 'framer-motion';
 
 function Main({ favorites, onToggleFavorite, searchQuery, filter }) {
   const { isLoggedIn } = useContext(UserContext);
@@ -19,6 +21,9 @@ function Main({ favorites, onToggleFavorite, searchQuery, filter }) {
   const [isSearching, setIsSearching] = useState(false);
   const [apiError, setApiError] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  // Estado para PopupWithForm y su preloader
+  const [popupLoading, setPopupLoading] = useState(false);
+  const [selectedPokemon, setSelectedPokemon] = useState(null);
   const hasFetchedPokemons = useRef(false);
 
   // Cargar todos los pokémon solo una vez al inicio (incluso en modo Strict)
@@ -124,15 +129,59 @@ function Main({ favorites, onToggleFavorite, searchQuery, filter }) {
     navigate('/');
   };
 
+  // Handlers para PopupWithForm
+  const handlePokemonClick = (pokemon) => {
+    setSelectedPokemon(pokemon);
+    setPopupLoading(true);
+    setTimeout(() => {
+      setPopupLoading(false);
+    }, 500); // Puedes ajustar el tiempo de carga simulado
+  };
+  const handleClosePopup = () => {
+    setSelectedPokemon(null);
+  };
+  const handleNavigate = (direction) => {
+    if (!selectedPokemon) return;
+    const currentIndex = filteredPokemons.findIndex(
+      (pokemon) => pokemon.name === selectedPokemon.name
+    );
+    let newIndex;
+    if (direction === 'prev') {
+      newIndex = (currentIndex - 1 + filteredPokemons.length) % filteredPokemons.length;
+    } else if (direction === 'next') {
+      newIndex = (currentIndex + 1) % filteredPokemons.length;
+    }
+    setSelectedPokemon(filteredPokemons[newIndex]);
+  };
+
   return (
     <main className="main">
+      {/* Popups y preloaders globales */}
+      {showLoginPrompt && <LoginRegister onClose={() => setShowLoginPrompt(false)} />}
+      {isSearching && (
+        <div className="preloader-container">
+          <Preloader />
+        </div>
+      )}
+      <AnimatePresence>
+        {selectedPokemon && (
+          popupLoading ? (
+            <div className="popup-loading-overlay">
+              <Preloader />
+            </div>
+          ) : (
+            <PopupWithForm
+              isOpen={true}
+              onClose={handleClosePopup}
+              pokemonUrl={selectedPokemon?.url}
+              onNavigate={handleNavigate}
+            />
+          )
+        )}
+      </AnimatePresence>
       <section className="main__content">
-        {showLoginPrompt && <LoginRegister onClose={() => setShowLoginPrompt(false)} />}
-        {isSearching ? (
-          <div className="preloader-container">
-            <Preloader />
-          </div>
-        ) : (
+        {/* Solo el contenido principal y rutas dentro de section */}
+        {!isSearching && (
           <Routes>
             <Route
               path="/favorites"
@@ -148,6 +197,7 @@ function Main({ favorites, onToggleFavorite, searchQuery, filter }) {
                     favorites={favorites}
                     onToggleFavorite={handleToggleFavoriteProtected}
                     pokemons={filteredPokemons}
+                    onPokemonClick={handlePokemonClick}
                   />
                 </>
               )}
@@ -169,6 +219,7 @@ function Main({ favorites, onToggleFavorite, searchQuery, filter }) {
                       favorites={favorites}
                       onToggleFavorite={handleToggleFavoriteProtected}
                       pokemons={filteredPokemons}
+                      onPokemonClick={handlePokemonClick}
                     />
                   </>
                 )

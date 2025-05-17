@@ -7,7 +7,7 @@
   position: relative;
   transform: translateZ(0);
   transition: transform var(--transition-normal), box-shadow var(--transition-normal);
-  pointer-events: auto; /* Corregí el valor dinámico por un valor estático */
+  pointer-events: auto;
 }
 
 .pokemon-card:hover {
@@ -42,7 +42,7 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 2; /* Mantener el valor permitido */
+  z-index: 2;
 }
 
 .pokemon-ball::after {
@@ -74,7 +74,6 @@
   height: 150px;
   object-fit: contain;
   transition: transform var(--transition-normal);
-  z-index: 1; /* Mantener el valor permitido */
   filter: drop-shadow(0 4px 6px rgb(0 0 0 / 10%));
 }
 
@@ -106,7 +105,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  z-index: 2; /* Mantener el valor permitido */
+  z-index: 2;
   transition: transform var(--transition-fast);
   border-radius: 50%;
 }
