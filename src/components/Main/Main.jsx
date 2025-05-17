@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useRef } from 'react';
 import { useLocation, useNavigate, Route, Routes } from 'react-router-dom';
 import { getPokemonList, getPokemonImage, fetchTypePokemons } from '../../utils/MainApi';
 import './Main.css';
@@ -19,46 +19,48 @@ function Main({ favorites, onToggleFavorite, searchQuery, filter }) {
   const [isSearching, setIsSearching] = useState(false);
   const [apiError, setApiError] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const hasFetchedPokemons = useRef(false);
 
-  // Cargar todos los pokémon solo una vez
+  // Cargar todos los pokémon solo una vez al inicio (incluso en modo Strict)
   useEffect(() => {
-    if (showFavorites && !isLoggedIn) {
-      navigate('/');
-      alert('Debes iniciar sesión para ver tus favoritos.');
-    }
-    // Solo cargar pokemons si no se han cargado antes
-    if (!showFavorites && pokemons.length === 0) {
-      setIsSearching(true);
-      getPokemonList(0, 1000)
-        .then((data) => {
-          if (!data || !Array.isArray(data.results)) {
-            setApiError(true);
-            setPokemons([]);
-            setFilteredPokemons([]);
-            return;
-          }
-          const basicPokemons = data.results.map((pokemon) => {
-            const id = pokemon.url.split('/')[6];
-            return {
-              ...pokemon,
-              id,
-              sprite: pokemon.sprite || getPokemonImage(id),
-            };
-          });
-          setPokemons(basicPokemons);
-          setFilteredPokemons(basicPokemons);
-        })
-        .catch((error) => {
+    if (hasFetchedPokemons.current) return;
+    hasFetchedPokemons.current = true;
+    setIsSearching(true);
+    getPokemonList(0, 1000)
+      .then((data) => {
+        if (!data || !Array.isArray(data.results)) {
           setApiError(true);
           setPokemons([]);
           setFilteredPokemons([]);
-          console.error('Error al cargar la lista de Pokémon:', error);
-        })
-        .finally(() => setIsSearching(false));
-    } else if (showFavorites) {
+          return;
+        }
+        const basicPokemons = data.results.map((pokemon) => {
+          const id = pokemon.url.split('/')[6];
+          return {
+            ...pokemon,
+            id,
+            sprite: pokemon.sprite || getPokemonImage(id),
+          };
+        });
+        setPokemons(basicPokemons);
+        setFilteredPokemons(basicPokemons);
+      })
+      .catch((error) => {
+        setApiError(true);
+        setPokemons([]);
+        setFilteredPokemons([]);
+        console.error('Error al cargar la lista de Pokémon:', error);
+      })
+      .finally(() => setIsSearching(false));
+    // Solo en el primer render
+  }, []);
+
+  // Mostrar favoritos solo si está logueado y en la ruta /favorites
+  useEffect(() => {
+    if (showFavorites && isLoggedIn) {
       setFilteredPokemons(favorites);
     }
-  }, [showFavorites, favorites, pokemons.length, isLoggedIn, navigate]);
+  }, [showFavorites, isLoggedIn, favorites]);
 
   // Un solo efecto para filtrar por búsqueda y tipos
   useEffect(() => {
@@ -116,6 +118,12 @@ function Main({ favorites, onToggleFavorite, searchQuery, filter }) {
     onToggleFavorite(pokemon);
   };
 
+  const handleBackToAll = () => {
+    setApiError(false);
+    setFilteredPokemons(pokemons);
+    navigate('/');
+  };
+
   return (
     <main className="main">
       <section className="main__content">
@@ -148,7 +156,7 @@ function Main({ favorites, onToggleFavorite, searchQuery, filter }) {
               path="/"
               element={(
                 apiError ? (
-                  <NotFound />
+                  <NotFound onBackToAll={handleBackToAll} />
                 ) : (
                   <>
                     {(searchQuery || showFavorites) && (
@@ -166,7 +174,7 @@ function Main({ favorites, onToggleFavorite, searchQuery, filter }) {
                 )
               )}
             />
-            <Route path="*" element={<NotFound />} />
+            <Route path="*" element={<NotFound onBackToAll={handleBackToAll} />} />
           </Routes>
         )}
       </section>
