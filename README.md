@@ -10,7 +10,7 @@ Esta aplicación es una Pokedex interactiva que permite a los usuarios buscar y 
 
 ## Link de acceso
 
-- [Coloca aquí el link de despliegue del frontend]
+- [https://pokedex-iosn.onrender.com](https://pokedex-iosn.onrender.com)
 
 ## Capturas del Proyecto
 
