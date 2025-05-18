@@ -48,13 +48,21 @@ function LoginRegister({ onClose }) {
           setIsLoggedIn(true);
           setUser(data.user || null);
           onClose();
+        } else if (data.status === 401) {
+          setError('Correo o contraseña incorrectos.');
+        } else if (data.status === 404) {
+          setError('Usuario no registrado.');
         } else {
           setError(data.message || 'Error al iniciar sesión');
         }
       } else {
         const data = await register(form.name, form.email, form.password);
-        if (data._id || data.email) {
+        if (data.status === 201 || data.email) {
           setIsLogin(true);
+        } else if (data.status === 400 && data.message && data.message.includes('duplicate')) {
+          setError('El correo ya está registrado.');
+        } else if (data.status === 400 && data.message && data.message.includes('correo')) {
+          setError('Correo electrónico no válido.');
         } else {
           setError(data.message || 'Error al registrarse');
         }
@@ -76,6 +84,7 @@ function LoginRegister({ onClose }) {
             <input
               type="text"
               name="name"
+              id='name'
               placeholder="Nombre"
               value={form.name}
               onChange={handleChange}
@@ -85,17 +94,21 @@ function LoginRegister({ onClose }) {
           <input
             type="email"
             name="email"
+            id='email'
             placeholder="Correo electrónico"
             value={form.email}
             onChange={handleChange}
+            autoComplete="username"
             required
           />
           <input
             type="password"
             name="password"
+            id='password'
             placeholder="Contraseña"
             value={form.password}
             onChange={handleChange}
+            autoComplete="current-password"
             required
           />
           {error && <div className="auth-modal__error">{error}</div>}

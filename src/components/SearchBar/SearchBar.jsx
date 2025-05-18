@@ -25,6 +25,8 @@ function SearchBar({ onSearch }) {
     <div className="search-bar">
       <input
         type="text"
+        name="seach"
+        id='seach'
         placeholder="nombre, tipo o número"
         value={query}
         onChange={handleInputChange}

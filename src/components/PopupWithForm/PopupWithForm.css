@@ -6,9 +6,9 @@
   justify-content: center;
   align-items: center;
   max-width: 1280px;
-  max-height: 500px;
   z-index: 3;
   pointer-events: auto;
+  height: calc(100vh - 70px);
 }
 
 .popup-content {
@@ -88,7 +88,7 @@
   align-items: center;
   width: 180px;
   height: 180px;
-  margin: 0 auto 10px auto;
+  margin: 0 auto;
 }
 
 .pokemon-detail-image {
@@ -208,4 +208,131 @@
   font-weight: 500;
   text-transform: capitalize;
   box-shadow: 0 1px 2px rgba(0,0,0,0.07);
+}
+.popup-nav {
+  display: flex;
+  margin: 0;
+  background-color: aqua;
+}
+
+.prev {
+  margin-right: 10px;
+}
+
+.next {
+  margin-left: 10px;
+}
+
+/* Móviles pequeños */
+@media (max-width: 544px) and (min-width: 320px) {
+  .popup-content {
+    max-width: 70vw;
+    max-height: 60vh;
+    padding: 6px;
+    border-radius: 12px;
+    overflow: auto;
+  }
+  .popup-overlay {
+    left: 0;
+    max-width: 100vw;
+    height: 100vh;
+    padding: 0;
+    flex-direction: column;
+  }
+  .pokemon-details {
+    flex-direction: column;
+    padding: 10px 0 5px 0;
+  }
+  .popup-image-container {
+    width: 120px;
+    height: 50px;
+  }
+  .pokemon-detail-image {
+    width: 100%;
+    height: 100%;
+  }
+  .pokemon-header h2 {
+    font-size: 1.2rem;
+  }
+  .pokemon-header span {
+    font-size: 1rem;
+  }
+  .pokemon-info {
+    gap: 10px;
+  }
+  .type-badge {
+    font-size: 0.85rem;
+    padding: 3px 8px;
+  }
+  .stat-name {
+    width: 60px;
+    font-size: 0.9rem;
+  }
+  .stat-value {
+    font-size: 0.9rem;
+  }
+  .ability-badge {
+    font-size: 0.85rem;
+    padding: 2px 7px;
+  }
+
+  .prev {
+    margin: 0 0 10px;
+  }
+
+  .next {
+    margin: 10px 0 0;
+  }
+}
+
+/* Tablets y pantallas medianas */
+@media (min-width: 545px) and (max-width: 1024px) {
+  .popup-content {
+    max-width: 80vw;
+    padding: 8px;
+    border-radius: 16px;
+  }
+  .popup-overlay {
+    left: 0;
+    max-width: 100vw;
+    height: 100vh;
+    padding: 0;
+    flex-direction: column;
+  }
+  .pokemon-details {
+    padding: 15px 0 8px 0;
+  }
+  .popup-image-container {
+    width: 150px;
+    height: 150px;
+  }
+  .pokemon-header h2 {
+    font-size: 1.5rem;
+  }
+  .pokemon-header span {
+    font-size: 1.1rem;
+  }
+  .type-badge {
+    font-size: 0.92rem;
+    padding: 4px 10px;
+  }
+  .stat-name {
+    width: 70px;
+    font-size: 0.97rem;
+  }
+  .stat-value {
+    font-size: 0.97rem;
+  }
+  .ability-badge {
+    font-size: 0.92rem;
+    padding: 3px 8px;
+  }
+
+    .prev {
+    margin: 0 0 10px;
+  }
+
+  .next {
+    margin: 10px 0 0;
+  }
 }

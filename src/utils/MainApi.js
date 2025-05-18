@@ -4,21 +4,23 @@
 const BASE_URL = 'https://api-pokedex-20x0.onrender.com'; // Cambia por el endpoint de tu backend si es necesario
 
 export const register = async (name, email, password) => {
-  const res = await fetch(`${BASE_URL}/users`, {
+  const res = await fetch(`${BASE_URL}/users/signup`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name, email, password })
   });
-  return res.json();
+  const data = await res.json();
+  return { ...data, status: res.status };
 };
 
 export const login = async (email, password) => {
-  const res = await fetch(`${BASE_URL}/signin`, {
+  const res = await fetch(`${BASE_URL}/users/signin`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password })
   });
-  return res.json();
+  const data = await res.json();
+  return { ...data, status: res.status };
 };
 
 export const getCurrentUser = async (token) => {
@@ -64,4 +66,40 @@ export const getFilterData = async () => {
   return res.json();
 };
 
-// Agrega aquí más funciones según los endpoints de tu backend
+// Agrega un Pokémon a favoritos en la base de datos
+export const addFavoritePokemon = async (pokemon, token) => {
+  const res = await fetch(`${BASE_URL}/pokemons`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      name: pokemon.name,
+      type: pokemon.type || [],
+      image: pokemon.sprite || pokemon.image || '',
+    }),
+  });
+  return res.json();
+};
+
+// Elimina un Pokémon de favoritos en la base de datos
+export const removeFavoritePokemon = async (pokemonId, token) => {
+  const res = await fetch(`${BASE_URL}/pokemons/${pokemonId}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+  return res.json();
+};
+
+// Obtiene los favoritos del usuario autenticado
+export const getUserFavorites = async (token) => {
+  const res = await fetch(`${BASE_URL}/pokemons`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+  return res.json();
+};

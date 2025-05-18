@@ -1,6 +1,7 @@
 .app {
   height: calc(100vh - 40px);
   display: flex;
+  position: relative;
   flex-direction: column;
   background-color: var(--color-background);
 }
@@ -49,16 +50,26 @@
   font-size: var(--font-size-sm);
 }
 
-@media (max-width: 768px) {
-  #root {
-    padding: 1rem;
+@media (max-width: 544px) and (min-width: 320px) {
+  .app__header {
+    padding: 10px;
   }
-
-  .app__header h1 {
-    font-size: var(--font-size-xl);
-  }
-
   .app__content {
+    padding: 0 2px;
+  }
+  .app__footer {
+    padding: 8px;
+  }
+}
+
+@media (min-width: 545px) and (max-width: 1024px) {
+  .app__header {
+    padding: 15px;
+  }
+  .app__content {
+    padding: 0 8px;
+  }
+  .app__footer {
     padding: 10px;
   }
 }

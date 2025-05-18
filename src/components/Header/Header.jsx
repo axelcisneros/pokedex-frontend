@@ -2,7 +2,7 @@ import { useState, useContext } from 'react';
 import './Header.css';
 import Navigation from '../Navigation/Navigation';
 import SearchBar from '../SearchBar/SearchBar';
-import Select from '../Select/Select';
+import CustomSelect from '../Select/CustomSelect';
 import UserContext from '../../context/UserContext';
 import LoginRegister from '../Auth/LoginRegister';
 
@@ -44,9 +44,9 @@ function Header({ onSearch, onFilter }) {
         <h1 className="header__title">Pokédex</h1>
         <SearchBar onSearch={onSearch} />
         <div className="header__filters">
-          <Select
+          <CustomSelect
             options={POKEMON_TYPES.map((type) => ({ value: type, label: type }))}
-            onChange={(e) => handleFilterChange(e, 'types')}
+            onChange={(value) => handleFilterChange({ target: { value } }, 'types')}
             placeholder={"Filtrar por tipo"}
             disabled={false}
           />

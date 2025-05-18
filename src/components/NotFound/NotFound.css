@@ -28,3 +28,22 @@
 .not-found__button:hover {
   background-color: #0056b3;
 }
+
+@media (max-width: 544px) and (min-width: 320px) {
+  .not-found__text {
+    font-size: 1.1rem;
+  }
+  .not-found__button {
+    width: 100%;
+    padding: 8px 0;
+  }
+}
+
+@media (min-width: 545px) and (max-width: 1024px) {
+  .not-found__text {
+    font-size: 1.3rem;
+  }
+  .not-found__button {
+    padding: 10px 12px;
+  }
+}

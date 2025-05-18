@@ -59,8 +59,16 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
+@media (max-width: 544px) and (min-width: 320px) {
   .pokeball-preloader {
-    animation: none;
+    width: 50px;
+    height: 50px;
+  }
+}
+
+@media (min-width: 545px) and (max-width: 1024px) {
+  .pokeball-preloader {
+    width: 65px;
+    height: 65px;
   }
 }

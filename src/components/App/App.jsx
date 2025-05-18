@@ -5,7 +5,7 @@ import Header from '../Header/Header';
 import Main from '../Main/Main';
 import Footer from '../Footer/Footer';
 import UserContext from '../../context/UserContext';
-import { getCurrentUser } from '../../utils/MainApi';
+import { getCurrentUser, getUserFavorites, addFavoritePokemon, removeFavoritePokemon } from '../../utils/MainApi';
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -16,52 +16,58 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [token, setToken] = useState(localStorage.getItem('jwt') || '');
 
+  // Cargar favoritos desde la base de datos cuando el usuario inicia sesión
   useEffect(() => {
-    // Cargar favoritos del localStorage
-    const savedFavorites = localStorage.getItem('pokemonFavorites');
-    if (savedFavorites) {
-      setFavorites(JSON.parse(savedFavorites));
-    }
-
-    // Verificar usuario autenticado
     if (token) {
       getCurrentUser(token).then((data) => {
         if (data && data.email) {
           setUser(data);
           setIsLoggedIn(true);
+          // Cargar favoritos del backend
+          getUserFavorites(token).then((favData) => {
+            setFavorites(Array.isArray(favData) ? favData : []);
+          });
         } else {
           setUser(null);
           setIsLoggedIn(false);
+          setFavorites([]);
         }
       }).catch(() => {
         setUser(null);
         setIsLoggedIn(false);
+        setFavorites([]);
       });
     } else {
       setUser(null);
       setIsLoggedIn(false);
+      setFavorites([]);
     }
-
     // Simular tiempo de carga inicial
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 2000);
-
     return () => clearTimeout(timer);
   }, [token]);
 
+  // Handler para agregar o quitar favoritos usando la base de datos
   const handleToggleFavorite = (pokemon) => {
-    setFavorites(prevFavorites => {
-      const isFavorite = prevFavorites.some(fav => fav.name === pokemon.name);
-      let newFavorites;
-      if (isFavorite) {
-        newFavorites = prevFavorites.filter(fav => fav.name !== pokemon.name);
-      } else {
-        newFavorites = [...prevFavorites, pokemon];
+    if (!isLoggedIn) return;
+    const isFavorite = favorites.some(fav => fav.name === pokemon.name);
+    if (isFavorite) {
+      // Buscar el favorito por nombre para obtener el _id
+      const favToRemove = favorites.find(fav => fav.name === pokemon.name);
+      if (favToRemove && favToRemove._id) {
+        removeFavoritePokemon(favToRemove._id, token).then(() => {
+          setFavorites(prev => prev.filter(fav => fav._id !== favToRemove._id));
+        });
       }
-      localStorage.setItem('pokemonFavorites', JSON.stringify(newFavorites));
-      return newFavorites;
-    });
+    } else {
+      addFavoritePokemon(pokemon, token).then((created) => {
+        if (created && created._id) {
+          setFavorites(prev => [...prev, created]);
+        }
+      });
+    }
   };
 
   const handleSearch = (query) => {
