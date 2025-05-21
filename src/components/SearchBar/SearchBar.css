@@ -22,3 +22,31 @@
 .search-bar__button:hover {
   background-color: #0056b3;
 }
+
+@media (max-width: 544px) and (min-width: 320px) {
+  .search-bar {
+    flex-direction: column;
+    gap: 6px;
+  }
+  .search-bar__input {
+    font-size: 0.95rem;
+    padding: 8px;
+  }
+  .search-bar__button {
+    width: 100%;
+    padding: 10px;
+  }
+}
+
+@media (min-width: 545px) and (max-width: 1024px) {
+  .search-bar {
+    gap: 8px;
+  }
+  .search-bar__input {
+    font-size: 1rem;
+    padding: 9px;
+  }
+  .search-bar__button {
+    padding: 10px 16px;
+  }
+}

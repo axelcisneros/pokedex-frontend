@@ -1,7 +1,7 @@
 .pokeball-preloader {
   width: 80px;
   height: 80px;
-  background-color: transparent; /* Eliminé el fondo del preloader */
+  background-color: #fff;
   border-radius: 50%;
   position: absolute;
   top: 50%;
@@ -13,7 +13,7 @@
   animation-duration: 1.25s;
   animation-timing-function: cubic-bezier(.36,.07,.19,.97);
   animation-iteration-count: infinite;
-  z-index: 1; /* Mantener el valor permitido */
+  z-index: 1;
 }
 
 .pokeball-preloader::before {
@@ -59,8 +59,16 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
+@media (max-width: 544px) and (min-width: 320px) {
   .pokeball-preloader {
-    animation: none;
+    width: 50px;
+    height: 50px;
+  }
+}
+
+@media (min-width: 545px) and (max-width: 1024px) {
+  .pokeball-preloader {
+    width: 65px;
+    height: 65px;
   }
 }

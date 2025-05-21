@@ -1,18 +1,22 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './PopupWithForm.css';
-import { getPokemonDetails } from '../../utils/pokeapi';
+import { getPokemonDetails } from '../../utils/MainApi';
 import Preloader from '../Preloader/Preloader';
 
 function PopupWithForm({ isOpen, onClose, pokemonUrl, onNavigate }) {
   const [pokemonData, setPokemonData] = useState(null);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const lastIdRef = useRef(null);
 
   useEffect(() => {
     if (isOpen && pokemonUrl) {
       const pokemonId = pokemonUrl.split('/')[6];
-      loadPokemonDetails(pokemonId);
+      if (lastIdRef.current !== pokemonId) {
+        lastIdRef.current = pokemonId;
+        loadPokemonDetails(pokemonId);
+      }
     }
   }, [isOpen, pokemonUrl]);
 

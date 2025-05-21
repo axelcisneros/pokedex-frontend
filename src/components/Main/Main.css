@@ -1,16 +1,14 @@
-/* Estilos específicos del componente Main */
 .main {
-  position: relative;
-  height: 500px;
+  height: calc(100vh - 200px);
   background-color: var(--color-background);
 }
 
 .main__content {
   max-width: 1280px;
-  height: 400px;
   margin: 0 auto;
   padding: 40px 20px;
   overflow: auto;
+  height: calc(100vh - 303px);
 }
 
 .main__preloader {
@@ -21,12 +19,25 @@
   background-color: var(--color-background);
 }
 
-@media (max-width: 768px) {
-  .main {
-    min-height: calc(100vh - 120px);
-  }
+.main__preloader-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+}
 
+@media (max-width: 544px) and (min-width: 320px) {
   .main__content {
-    padding: 20px 10px;
+    padding: 10px 2px;
+  }
+}
+
+@media (min-width: 545px) and (max-width: 1024px) {
+  .main__content {
+    padding: 20px 8px;
   }
 }

@@ -1,10 +1,26 @@
 import { motion } from 'framer-motion';
 import './PokemonCard.css';
-import { getHighQualitySprite } from '../../utils/pokeapi.js';
+import { getPokemonDetails } from '../../utils/MainApi.js';
+import { useEffect, useState } from 'react';
 
 function PokemonCard({ pokemon, onCardClick, onFavoriteClick, isFavorite }) {
-  const pokemonId = pokemon.url.split('/')[6];
-  const imageUrl = getHighQualitySprite(pokemonId);
+  const pokemonId = pokemon.id || (pokemon.url && pokemon.url.split('/')[6]);
+  const [sprite, setSprite] = useState(pokemon.sprite || '');
+
+  useEffect(() => {
+    let isMounted = true;
+    if (!sprite && pokemonId) {
+      getPokemonDetails(pokemonId).then(data => {
+        if (!isMounted) return;
+        if (data && data.sprites && data.sprites.other && data.sprites.other['official-artwork'] && data.sprites.other['official-artwork'].front_default) {
+          setSprite(data.sprites.other['official-artwork'].front_default);
+        } else if (data && data.sprites && data.sprites.front_default) {
+          setSprite(data.sprites.front_default);
+        }
+      });
+    }
+    return () => { isMounted = false; };
+  }, [pokemonId, sprite]);
 
   const handleFavoriteClick = (e) => {
     e.stopPropagation();
@@ -30,17 +46,22 @@ function PokemonCard({ pokemon, onCardClick, onFavoriteClick, isFavorite }) {
       </button>
 
       <div className="card-image-container">
-        <motion.img 
-          src={imageUrl} 
-          alt={pokemon.name}
-          className="pokemon-image"
-          initial={{ scale: 0, rotate: 360 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ type: "spring", stiffness: 260, damping: 20 }}
-        />
+        {sprite ? (
+          <motion.img 
+            src={sprite} 
+            alt={pokemon.name}
+            className="pokemon-image"
+            initial={{ scale: 0, rotate: 360 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: "spring", stiffness: 260, damping: 20 }}
+            onError={e => { e.target.onerror = null; e.target.src = '/Pokebola-pokeball-png-0.png'; }}
+          />
+        ) : (
+          <img src="/Pokebola-pokeball-png-0.png" alt="No sprite" className="pokemon-image" />
+        )}
       </div>
       <h3 className="pokemon-name">{pokemon.name}</h3>
-      <span className="pokemon-number">#{pokemonId.padStart(3, '0')}</span>
+      <span className="pokemon-number">#{String(pokemonId).padStart(3, '0')}</span>
     </motion.div>
   );
 }

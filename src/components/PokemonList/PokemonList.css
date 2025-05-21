@@ -1,4 +1,3 @@
-/* Estilos específicos del componente PokemonList */
 .pokemon-container {
   padding: 20px;
   position: relative;
@@ -19,7 +18,7 @@
   inset: 0;
   display: grid;
   place-items: center;
-  z-index: 1; /* Mantener el valor permitido */
+  z-index: 1;
 }
 
 .pokemon-loading {
@@ -64,19 +63,22 @@
   transform: translateY(0);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 544px) and (min-width: 320px) {
   .pokemon-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 15px;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .pokemon-container {
+    padding: 10px;
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .pokemon-container {
-    scroll-behavior: auto;
+@media (min-width: 545px) and (max-width: 1024px) {
+  .pokemon-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
   }
-  
-  .load-more-button {
-    transition: none;
+  .pokemon-container {
+    padding: 15px;
   }
 }
