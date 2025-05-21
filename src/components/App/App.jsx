@@ -6,6 +6,7 @@ import Main from '../Main/Main';
 import Footer from '../Footer/Footer';
 import UserContext from '../../context/UserContext';
 import { getCurrentUser, getUserFavorites, addFavoritePokemon, removeFavoritePokemon } from '../../utils/MainApi';
+import ProtectedRoute from '../ProtectedRoute/ProtectedRoute';
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -85,17 +86,31 @@ function App() {
         <div className="app__content">
           <Header onSearch={handleSearch} onFilter={handleFilter} />
           <Routes>
-            <Route 
-              path="*" 
+            <Route
+              path="/favorites"
               element={
-                <Main 
+                <ProtectedRoute>
+                  <Main
+                    favorites={favorites}
+                    onToggleFavorite={handleToggleFavorite}
+                    searchQuery={searchQuery}
+                    filter={filter}
+                    isLoading={isLoading}
+                  />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="*"
+              element={
+                <Main
                   favorites={favorites}
                   onToggleFavorite={handleToggleFavorite}
                   searchQuery={searchQuery}
                   filter={filter}
                   isLoading={isLoading}
                 />
-              } 
+              }
             />
           </Routes>
           <Footer />

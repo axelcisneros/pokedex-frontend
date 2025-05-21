@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, useRef } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useLocation, useNavigate, Route, Routes } from 'react-router-dom';
 import { getPokemonList, getPokemonImage, fetchTypePokemons } from '../../utils/MainApi';
 import './Main.css';
@@ -24,19 +24,50 @@ function Main({ favorites, onToggleFavorite, searchQuery, filter }) {
   // Estado para PopupWithForm y su preloader
   const [popupLoading, setPopupLoading] = useState(false);
   const [selectedPokemon, setSelectedPokemon] = useState(null);
-  const hasFetchedPokemons = useRef(false);
 
-  // Cargar todos los pokémon solo una vez al inicio (incluso en modo Strict)
+  // PAGINACIÓN
+  const [page, setPage] = useState(1);
+  const [limit] = useState(12);
+  const [filteredTotal, setFilteredTotal] = useState(0);
+
+  // Cargar pokémon paginados (todos, filtrados, favoritos)
   useEffect(() => {
-    if (hasFetchedPokemons.current) return;
-    hasFetchedPokemons.current = true;
     setIsSearching(true);
-    getPokemonList(0, 1000)
-      .then((data) => {
-        if (!data || !Array.isArray(data.results)) {
-          setApiError(true);
-          setPokemons([]);
+    let fetchPromise;
+    if (showFavorites) {
+      // Paginación para favoritos
+      setFilteredTotal(favorites.length);
+      const start = (page - 1) * limit;
+      const end = start + limit;
+      setFilteredPokemons(favorites.slice(start, end));
+      setIsSearching(false);
+      return;
+    } else if (filter && filter.types && filter.types.length > 0) {
+      fetchPromise = fetchTypePokemons(filter.types).then((result) => {
+        if (result && result.pokemons) {
+          const pokes = result.pokemons.map((poke) => {
+            const id = poke.url ? poke.url.split('/')[6] : poke.name;
+            return {
+              ...poke,
+              id,
+              sprite: poke.sprite || getPokemonImage(id),
+            };
+          });
+          setFilteredTotal(pokes.length);
+          const start = (page - 1) * limit;
+          const end = start + limit;
+          setFilteredPokemons(pokes.slice(start, end));
+        } else {
           setFilteredPokemons([]);
+          setFilteredTotal(0);
+        }
+      });
+    } else if (searchQuery) {
+      // Filtrado por búsqueda (sobre todos los pokémon cargados)
+      fetchPromise = getPokemonList(0, 1000).then((data) => {
+        if (!data || !Array.isArray(data.results)) {
+          setFilteredPokemons([]);
+          setFilteredTotal(0);
           return;
         }
         const basicPokemons = data.results.map((pokemon) => {
@@ -47,18 +78,45 @@ function Main({ favorites, onToggleFavorite, searchQuery, filter }) {
             sprite: pokemon.sprite || getPokemonImage(id),
           };
         });
+        const filtered = basicPokemons.filter((pokemon) => {
+          const matchesName = pokemon.name.toLowerCase().includes(searchQuery.toLowerCase());
+          const matchesId = pokemon.id === searchQuery;
+          return matchesName || matchesId;
+        });
+        setFilteredTotal(filtered.length);
+        const start = (page - 1) * limit;
+        const end = start + limit;
+        setFilteredPokemons(filtered.slice(start, end));
+      });
+    } else {
+      // Lista completa paginada
+      fetchPromise = getPokemonList((page - 1) * limit, limit).then((data) => {
+        if (!data || !Array.isArray(data.results)) {
+          setPokemons([]);
+          setFilteredPokemons([]);
+          setFilteredTotal(0);
+          return;
+        }
+        setFilteredTotal(data.count || 0);
+        const basicPokemons = data.results.map((pokemon) => {
+          const id = pokemon.url.split('/')[6];
+          return {
+            ...pokemon,
+            id,
+            sprite: pokemon.sprite || getPokemonImage(id),
+          };
+        });
         setPokemons(basicPokemons);
         setFilteredPokemons(basicPokemons);
-      })
-      .catch((error) => {
-        setApiError(true);
-        setPokemons([]);
-        setFilteredPokemons([]);
-        console.error('Error al cargar la lista de Pokémon:', error);
-      })
-      .finally(() => setIsSearching(false));
-    // Solo en el primer render
-  }, []);
+      });
+    }
+    Promise.resolve(fetchPromise).finally(() => setIsSearching(false));
+  }, [page, limit, showFavorites, favorites, filter, searchQuery]);
+
+  // Resetear página al cambiar de filtro, favoritos o búsqueda
+  useEffect(() => {
+    setPage(1);
+  }, [showFavorites, filter, searchQuery]);
 
   // Mostrar favoritos solo si está logueado y en la ruta /favorites
   useEffect(() => {
@@ -67,45 +125,45 @@ function Main({ favorites, onToggleFavorite, searchQuery, filter }) {
     }
   }, [showFavorites, isLoggedIn, favorites]);
 
-  // Un solo efecto para filtrar por búsqueda y tipos
-  useEffect(() => {
-    if (showFavorites) {
-      setFilteredPokemons(favorites);
-      return;
-    }
-    let filtered = pokemons;
-    let filterPromise = Promise.resolve(filtered);
-
-    if (filter && filter.types && filter.types.length > 0) {
-      filterPromise = fetchTypePokemons(filter.types).then((result) => {
-        if (result && result.pokemons) {
-          // Mapear los pokemons devueltos por el backend y agregar el sprite
-          return result.pokemons.map((poke) => {
-            const id = poke.url ? poke.url.split('/')[6] : poke.name;
-            return {
-              ...poke,
-              id,
-              sprite: getPokemonImage(id),
-            };
-          });
-        }
-        return [];
-      });
-    }
-
-    filterPromise.then((filteredByType) => {
-      let finalFiltered = filteredByType;
-      if (searchQuery) {
-        finalFiltered = finalFiltered.filter((pokemon) => {
-          const matchesName = pokemon.name.toLowerCase().includes(searchQuery.toLowerCase());
-          const matchesId = pokemon.id === searchQuery;
-          return matchesName || matchesId;
-        });
-      }
-      setFilteredPokemons(finalFiltered);
-      setApiError(finalFiltered.length === 0);
-    });
-  }, [searchQuery, filter, pokemons, favorites, showFavorites]);
+  // Eliminar el efecto redundante de filtrado por búsqueda y tipos
+  // useEffect(() => {
+  //   if (showFavorites) {
+  //     setFilteredPokemons(favorites);
+  //     return;
+  //   }
+  //   let filtered = pokemons;
+  //   let filterPromise = Promise.resolve(filtered);
+  //
+  //   if (filter && filter.types && filter.types.length > 0) {
+  //     filterPromise = fetchTypePokemons(filter.types).then((result) => {
+  //       if (result && result.pokemons) {
+  //         // Mapear los pokemons devueltos por el backend y agregar el sprite
+  //         return result.pokemons.map((poke) => {
+  //           const id = poke.url ? poke.url.split('/')[6] : poke.name;
+  //           return {
+  //             ...poke,
+  //             id,
+  //             sprite: getPokemonImage(id),
+  //           };
+  //         });
+  //       }
+  //       return [];
+  //     });
+  //   }
+  //
+  //   filterPromise.then((filteredByType) => {
+  //     let finalFiltered = filteredByType;
+  //     if (searchQuery) {
+  //       finalFiltered = finalFiltered.filter((pokemon) => {
+  //         const matchesName = pokemon.name.toLowerCase().includes(searchQuery.toLowerCase());
+  //         const matchesId = pokemon.id === searchQuery;
+  //         return matchesName || matchesId;
+  //       });
+  //     }
+  //     setFilteredPokemons(finalFiltered);
+  //     setApiError(finalFiltered.length === 0);
+  //   });
+  // }, [searchQuery, filter, pokemons, favorites, showFavorites]);
 
   const resetToAllPokemons = () => {
     setFilteredPokemons(pokemons);
@@ -154,6 +212,18 @@ function Main({ favorites, onToggleFavorite, searchQuery, filter }) {
     setSelectedPokemon(filteredPokemons[newIndex]);
   };
 
+  // Componente de paginación reutilizable
+  const PaginationControls = ({ page, totalPages, setPage }) => (
+    <div className="pagination">
+      <button onClick={() => setPage(page - 1)} disabled={page === 1}>Anterior</button>
+      <span>Página {page} de {totalPages}</span>
+      <button onClick={() => setPage(page + 1)} disabled={page === totalPages}>Siguiente</button>
+    </div>
+  );
+
+  // Paginación UI
+  const totalPages = Math.max(1, Math.ceil(filteredTotal / limit));
+
   return (
     <main className="main">
       {/* Popups y preloaders globales */}
@@ -182,38 +252,19 @@ function Main({ favorites, onToggleFavorite, searchQuery, filter }) {
       <section className="main__content">
         {/* Solo el contenido principal y rutas dentro de section */}
         {!isSearching && (
-          <Routes>
-            <Route
-              path="/favorites"
-              element={(
-                <>
-                  {(searchQuery || showFavorites) && (
-                    <Button onClick={resetToAllPokemons} className="button main__reset-button">
-                      Volver a todos
-                    </Button>
-                  )}
-                  <PokemonList 
-                    showOnlyFavorites={showFavorites}
-                    favorites={favorites}
-                    onToggleFavorite={handleToggleFavoriteProtected}
-                    pokemons={filteredPokemons}
-                    onPokemonClick={handlePokemonClick}
-                  />
-                </>
-              )}
-            />
-            <Route
-              path="/"
-              element={(
-                apiError ? (
-                  <NotFound onBackToAll={handleBackToAll} />
-                ) : (
+          <>
+            <Routes>
+              <Route
+                path="/favorites"
+                element={(
                   <>
                     {(searchQuery || showFavorites) && (
                       <Button onClick={resetToAllPokemons} className="button main__reset-button">
                         Volver a todos
                       </Button>
                     )}
+                    {/* Paginación arriba */}
+                    <PaginationControls page={page} totalPages={totalPages} setPage={setPage} />
                     <PokemonList 
                       showOnlyFavorites={showFavorites}
                       favorites={favorites}
@@ -221,12 +272,40 @@ function Main({ favorites, onToggleFavorite, searchQuery, filter }) {
                       pokemons={filteredPokemons}
                       onPokemonClick={handlePokemonClick}
                     />
+                    {/* Paginación abajo */}
+                    <PaginationControls page={page} totalPages={totalPages} setPage={setPage} />
                   </>
-                )
-              )}
-            />
-            <Route path="*" element={<NotFound onBackToAll={handleBackToAll} />} />
-          </Routes>
+                )}
+              />
+              <Route
+                path="*"
+                element={(
+                  apiError ? (
+                    <NotFound onBackToAll={handleBackToAll} />
+                  ) : (
+                    <>
+                      {(searchQuery || showFavorites) && (
+                        <Button onClick={resetToAllPokemons} className="button main__reset-button">
+                          Volver a todos
+                        </Button>
+                      )}
+                      {/* Paginación arriba */}
+                      <PaginationControls page={page} totalPages={totalPages} setPage={setPage} />
+                      <PokemonList 
+                        showOnlyFavorites={showFavorites}
+                        favorites={favorites}
+                        onToggleFavorite={handleToggleFavoriteProtected}
+                        pokemons={filteredPokemons}
+                        onPokemonClick={handlePokemonClick}
+                      />
+                      {/* Paginación abajo */}
+                      <PaginationControls page={page} totalPages={totalPages} setPage={setPage} />
+                    </>
+                  )
+                )}
+              />
+            </Routes>
+          </>
         )}
       </section>
     </main>
